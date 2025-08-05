@@ -116,11 +116,36 @@ async def shutdown_browser():
 @tool
 def get_current_location() -> str:
     """
-    Returns the user's current physical location.
+    Returns the user's current physical location based on their IP address.
     This tool should be used when the user asks 'where am I?' or for their current city.
     """
-    # This is hardcoded based on the provided context.
-    return "Montreal, Quebec, Canada."
+    if not gmaps_client:
+        return "Error: The Google Maps client is not configured. Please check the API key."
+    try:
+        # Get the user's current location using the Geolocation API
+        geolocation_result = gmaps_client.geolocate()
+        
+        if not geolocation_result or 'location' not in geolocation_result:
+            return "Could not determine current location."
+
+        lat = geolocation_result['location']['lat']
+        lng = geolocation_result['location']['lng']
+
+        # Perform a reverse geocode to get the address
+        reverse_geocode_result = gmaps_client.reverse_geocode((lat, lng))
+
+        if not reverse_geocode_result:
+            return f"Could not find address for location: ({lat}, {lng})."
+
+        # Return the first (most accurate) address
+        return reverse_geocode_result[0]['formatted_address']
+
+    except googlemaps.exceptions.ApiError as api_err:
+        print(f"Google Maps API Error: {api_err}")
+        return f"Error contacting Google Maps: {api_err}"
+    except Exception as e:
+        print(f"An unexpected error occurred during location lookup: {e}")
+        return f"An unexpected error occurred: {e}"
 
 
 # --- Weather Tool ---
