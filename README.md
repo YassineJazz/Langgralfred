@@ -35,7 +35,7 @@ Alfred is a voice-activated personal assistant inspired by Batman's loyal butler
 
 1. **Clone the repository:**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/YassineJazz/Langgralfred.git
    cd LanggraphAlfred
    ```
 
